@@ -72,9 +72,9 @@ blogPostsRouter.route('/:blogId/comments')
     try {
         const blogs = await blogModel.findById(req.params.blogId)
         if(user){
-            res.send(blogs.blogs)
+            res.send(blogs.comments)
         }else{
-            next(createError(404, `blog with id ${req.params.userId} not found!`))
+            next(createError(404, `blog with id ${req.params.blogId} not found!`))
         }
     } catch (error) {
         next(error)
@@ -150,4 +150,9 @@ blogPostsRouter.route('/:blogId/comments/:commentId')
 }})
 
 
+
+
 export default blogPostsRouter
+
+
+

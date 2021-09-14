@@ -7,9 +7,9 @@ const commentRouter = express.Router()
 
 commentRouter.get('/',async(req,res,next)=>{
     try {
-        // const query =q2m(req.query)
-        // const total = await commentBlog.countDocuments(query.criteria)
-        const comment = await commentBlog.find()
+        const query =q2m(req.query)
+        const total = await commentBlog.countDocuments(query.criteria)
+        const comment = await commentBlog.find(query.criteria,query.options.fields).limit().skip().sort().populate('author')
         res.send(comment)
     } catch (error) {
         next(error)
