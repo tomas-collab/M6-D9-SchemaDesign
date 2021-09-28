@@ -23,5 +23,12 @@ userSchema.pre('save', async function(next){
 	}
 	next()
 })
+
+userSchema.methods.toJSON = function(){
+   const userData = this
+   userObject = userData.toObject()
+   delete userObject.password
+   return userObject
+}
 export default model('User',userSchema)
 
