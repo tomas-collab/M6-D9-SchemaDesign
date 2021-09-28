@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/tomas-collab/M6-D7#readme",
   "dependencies": {
+    "atob": "^2.1.2",
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-list-endpoints": "^6.0.0",
