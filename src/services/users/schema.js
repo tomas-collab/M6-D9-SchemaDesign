@@ -26,9 +26,19 @@ userSchema.pre('save', async function(next){
 
 userSchema.methods.toJSON = function(){
    const userData = this
-   userObject = userData.toObject()
+   const userObject = userData.toObject()
    delete userObject.password
    return userObject
+}
+userSchema.statics.checkCredentials = async function(email,plainPw){
+             const user = await this.findOne({email})
+			 if(user){
+				 const isMatched = await bcrypt.compare(plainPw,user.password)
+				 if(isMatched) return user 
+				 else return null
+			 }else{
+				 return null
+			 }
 }
 export default model('User',userSchema)
 

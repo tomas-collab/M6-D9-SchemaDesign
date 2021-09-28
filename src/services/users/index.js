@@ -1,5 +1,6 @@
 import express from 'express'
 import q2m from 'query-to-mongo'
+import { auth } from '../../authenticate/index.js'
 import userBlog from './schema.js'
 
 const userRouter = express.Router()
@@ -13,7 +14,7 @@ userRouter.route('/')
         next(error)
     }
 })
-.get(async(req,res,next)=>{
+.get(auth, async(req,res,next)=>{
     try {
         // const query =q2m(req.query)
         // const total = await userBlog.countDocuments(query.criteria)

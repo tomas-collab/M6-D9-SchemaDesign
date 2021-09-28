@@ -3,7 +3,7 @@ import listEndpoints from 'express-list-endpoints'
 
 
 import mongoose from 'mongoose'
-import { badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler } from './errorHandlers.js'
+import { badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler, unauthorizedHandler } from './errorHandlers.js'
 import authorRouter from './services/authors/index.js'
 import blogsRouter  from './services/blogPosts/index.js'
 import commentRouter from './services/comments/index.js'
@@ -24,6 +24,7 @@ server.use('/authors',authorRouter)
 server.use(badRequestErrorHandler)
 server.use(catchAllErrorHandler)
 server.use(notFoundErrorHandler)
+server.use(unauthorizedHandler)
 
 mongoose.connect(process.env.MONGO_CONNECTION)
 mongoose.connection.on("connected",()=>{
