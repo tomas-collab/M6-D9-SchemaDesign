@@ -5,6 +5,14 @@ export const notFoundErrorHandler = (err, req, res, next) => {
       next(err) // I need to pass the error to the next error middleware
     }
   }
+  export const unauthorizedHandler = (err, req, res, next) => {
+    if (err.status === 401) {
+      res.status(401).send({ status: "error", message: err.message || "You are not logged in!" })
+    } else {
+      next(err)
+    }
+  }
+  
   
   export const badRequestErrorHandler = (err, req, res, next) => {
     if (err.status === 400 || err.name === "ValidationError") {
