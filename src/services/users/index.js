@@ -16,12 +16,46 @@ userRouter.route('/')
 })
 .get(auth, async(req,res,next)=>{
     try {
-        // const query =q2m(req.query)
-        // const total = await userBlog.countDocuments(query.criteria)
         const user = await userBlog.find()
         res.send(user)
     } catch (error) {
         next(error)
     }
 })
+userRouter.route('/default')
+.get(auth, async(req,res,next)=>{
+    try {
+        res.send(req.user)
+    } catch (error) {
+        next(error)
+    }
+})
+.put(auth, async(req,res,next)=>{
+    try {
+        req.user.name = req.body.name
+        await req.user.save()
+        res.send()
+    } catch (error) {
+        next(error)
+    }
+})
+.delete(auth, async(req,res,next)=>{
+    try {
+        await req.user.deleteOne()
+       res.send()
+    } catch (error) {
+        next(error)
+    }
+})
+
+userRouter.route('/:id')
+.get(async(req,res,next)=>{
+    try {
+        const oneUser = await userBlog.findById(req.params.id)
+        res.send(oneUser)
+    } catch (error) {
+        next(error)
+    }
+})
+
 export default userRouter
