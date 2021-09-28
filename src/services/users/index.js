@@ -1,5 +1,6 @@
 import express from 'express'
 import q2m from 'query-to-mongo'
+import { adminMiddleware } from '../../authenticate/admin.js'
 import { auth } from '../../authenticate/index.js'
 import userBlog from './schema.js'
 
@@ -42,14 +43,14 @@ userRouter.route('/default')
 .delete(auth, async(req,res,next)=>{
     try {
         await req.user.deleteOne()
-       res.send()
+       res.send('deleted')
     } catch (error) {
         next(error)
     }
 })
 
 userRouter.route('/:id')
-.get(async(req,res,next)=>{
+.get(auth,adminMiddleware,async(req,res,next)=>{
     try {
         const oneUser = await userBlog.findById(req.params.id)
         res.send(oneUser)
