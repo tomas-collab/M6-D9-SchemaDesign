@@ -1,5 +1,6 @@
 import express from 'express'
 import q2m from 'query-to-mongo'
+import { AuthorAuth } from '../../authenticate/author.js'
 import { auth } from '../../authenticate/index.js'
 
 
@@ -18,25 +19,29 @@ authorRouter.get('/',async(req,res,next)=>{
     }
 })
 authorRouter.route('/me')
-.get(auth,async(req,res,next)=>{
+.get(AuthorAuth,async(req,res,next)=>{
     try {
-        
+       
+        res.send(req.author)
     } catch (error) {
-        
+        next(error)
     }
 })
 .put(auth,async(req,res,next)=>{
     try {
-        
+        req.author.name = req.body.name
+        await req.author.save()
+        res.send()
     } catch (error) {
-        
+        next(error)
     }
 })
 .delete(auth,async(req,res,next)=>{
     try {
-        
+        await req.author.deleteOne()
+        res.send('deleted')
     } catch (error) {
-        
+        next(error)
     }
 })
 
