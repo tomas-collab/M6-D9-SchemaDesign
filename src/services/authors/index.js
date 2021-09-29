@@ -1,7 +1,9 @@
 import express from 'express'
+import createHttpError from 'http-errors'
 import q2m from 'query-to-mongo'
 import { AuthorAuth } from '../../authenticate/author.js'
 import { auth } from '../../authenticate/index.js'
+import { jwtAuth } from '../../authenticate/tools.js'
 
 
 import authorBlog from './schema.js'
@@ -51,6 +53,23 @@ authorRouter.post('/',async(req,res,next)=>{
         const newauthor = new authorBlog(req.body)
         const author= await newauthor.save()
         res.status(201).send(author)
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+authorRouter.route("/login")
+.post(async(req,res,next)=>{
+    try {
+       const {email,password} = req.body
+       const author = await authorBlog.checkCredentials(email,password)
+       if(author){
+           const accessToken = await jwtAuth(author)
+           res.send({accessToken})
+       }else{
+           next(createHttpError(401,'something wrong with credentials'))
+       }
     } catch (error) {
         next(error)
     }
