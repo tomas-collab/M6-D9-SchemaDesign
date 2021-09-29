@@ -49,8 +49,8 @@ authorRouter.route('/me')
 authorRouter.post('/',async(req,res,next)=>{
     try {
         const newauthor = new authorBlog(req.body)
-        const {_id}= await newauthor.save()
-        res.status(201).send({_id})
+        const author= await newauthor.save()
+        res.status(201).send(author)
     } catch (error) {
         next(error)
     }

@@ -31,7 +31,7 @@ const authorSchema = new Schema({
 
 	authorSchema.statics.checkCredentials = async function(email,plainPw){
 		const author = await this.findOne({email})
-		if(user){
+		if(author){
 			const isMatch = await bcrypt.compare(plainPw,author.password)
 			if(isMatch) return author
 			else return null
