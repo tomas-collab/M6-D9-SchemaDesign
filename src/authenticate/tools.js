@@ -2,12 +2,12 @@ import jwt from 'jsonwebtoken'
 
 const generateJWT = payload=>
        new Promise((resolve,reject)=>
-         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:"5mins"},(err,token)=>{
+         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:"1 week"},(err,token)=>{
            if(err) reject(err)
             resolve(token)
      })
      )
-     
+
 export const jwtAuth = async author =>{
     const accessToken = await generateJWT({_id:author._id})
     return accessToken
