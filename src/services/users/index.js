@@ -5,7 +5,17 @@ import { auth } from '../../authenticate/index.js'
 import userBlog from './schema.js'
 
 const userRouter = express.Router()
-userRouter.route('/')
+userRouter.route('')
+.get(async(req,res,next)=>{
+        try {
+            const user = await userBlog.find()
+            res.send(user)
+        } catch (error) {
+            next(error)
+        }
+})
+
+userRouter.route('/register')
 .post(async(req,res,next)=>{
     try {
         const user = new userBlog(req.body)
@@ -23,6 +33,8 @@ userRouter.route('/')
         next(error)
     }
 })
+
+
 userRouter.route('/default')
 .get(auth, async(req,res,next)=>{
     try {

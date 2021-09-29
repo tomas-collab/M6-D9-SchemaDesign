@@ -31,6 +31,7 @@ userSchema.methods.toJSON = function(){
    delete userObject.password
    return userObject
 }
+
 userSchema.statics.checkCredentials = async function(email,plainPw){
              const user = await this.findOne({email})
 			 if(user){

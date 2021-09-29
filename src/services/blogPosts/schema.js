@@ -12,13 +12,19 @@ const blogSchema = new Schema({
 	      unit: {type:Number},
 	    },
 	    author: {
-	      name: {type: String,required:true},
-	      avatar:{type: String,required:true}
+	           type:Schema.Types.ObjectId,required:true,ref:'Author'
 	    },comments:[{
 			comment:String,
 			rate:Number,
 			commentedDate:Date
 		}],
+		likes:{
+			default:[],
+			type:
+			[{
+				type:Schema.Types.ObjectId,ref:'Author'
+			}],
+		}
 	},{
 		timestamps:true
 	})

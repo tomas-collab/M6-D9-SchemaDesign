@@ -7,7 +7,7 @@ const blogPostsRouter = express.Router()
 blogPostsRouter.route('/')
 .get(async(req,res,next)=>{
     try {
-        const blogs = await blogModel.find()
+        const blogs = await blogModel.find().populate('author')
         res.send(blogs)
     } catch (error) {
         next(error)
@@ -16,8 +16,8 @@ blogPostsRouter.route('/')
 .post(async(req,res,next)=>{
     try {
         const newBlog = new blogModel(req.body)
-        const {_id}= await newBlog.save()
-        res.status(201).send({_id})
+        const blog= await newBlog.save()
+        res.status(201).send(blog)
     } catch (error) {
         next(error)
     }
@@ -26,7 +26,7 @@ blogPostsRouter.route('/:blogId')
 .get(async(req,res,next)=>{
     try {
         const blogId = req.params.blogId
-        const blog = await blogModel.findById(blogId)
+        const blog = await blogModel.findById(blogId).populate('author')
         if(blog){
             res.send(blog)
         }else{ next(createError(404, `blog with id ${blogId} not found!`))}
@@ -59,7 +59,22 @@ blogPostsRouter.route('/:blogId')
     }
 })
 
-
+blogPostsRouter.route('/:blogId/likes')
+.put(async(req,res,next)=>{
+    try {
+        const {id} = req.body
+        const isLiked = await blogModel.findOne({_id:req.params.blogId, likes:id})
+        if(isLiked){
+            await blogModel.findByIdAndUpdate(req.params.blogId,{$pull:{likes:id}})
+            res.send("liked")
+        }else{
+            await blogModel.findByIdAndUpdate(req.params.blogId,{$push:{likes:id}})
+            res.send('unliked')
+        }
+    } catch (error) {
+        
+    }
+})
 
 
 

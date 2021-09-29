@@ -13,7 +13,7 @@ export const notFoundErrorHandler = (err, req, res, next) => {
     }
   }
   
-  
+
   export const badRequestErrorHandler = (err, req, res, next) => {
     if (err.status === 400 || err.name === "ValidationError") {
       res.status(400).send(err.errors)
