@@ -8,7 +8,9 @@ const authorSchema = new Schema({
 	name: { type: String, required: true },
     surname: { type: String, required: true },
 	email: { type: String, required: true },
-	password: { type: String, required: true },
+	password: { type: String },
+	refreshToken: { type: String },
+    googleId: { type: String },
 	// blog:{type:Schema.Types.ObjectId,ref:"Blogpost"}
 	},{
 		timestamps:true
