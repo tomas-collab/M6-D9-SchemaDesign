@@ -1,5 +1,6 @@
 import express from 'express'
 import createHttpError from 'http-errors'
+import passport from 'passport'
 import q2m from 'query-to-mongo'
 import { AuthorAuth } from '../../authenticate/author.js'
 import { jwtAuth } from '../../authenticate/tools.js'
@@ -85,4 +86,18 @@ authorRouter.route('/register')
         next(error)
     }
 })
+
+authorRouter.route('/googleLogin')
+.get(passport.authenticate('google',{scope:['profile','email']}))
+
+
+authorRouter.route('/googleRedirect')
+.get(passport.authenticate('google'),async(req,res,next)=>{
+    try {
+        res.redirect(`http://localhost:3001?accessToken=${req.author.tokens.accessToken}`)
+    } catch (error) {
+        next(error)
+    }
+})
+
 export default authorRouter

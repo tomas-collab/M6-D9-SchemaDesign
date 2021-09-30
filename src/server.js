@@ -15,8 +15,12 @@ const server = express()
 const port = process.env.PORT || 3001
 
 passport.use('google',GoogleStrategy)
+
+
+
 server.use(cors())
 server.use(express.json())
+server.use(passport.initialize())
 
 server.use("/blogPosts", blogsRouter)
 server.use('/comments',commentRouter)
