@@ -2,6 +2,8 @@ import express from 'express'
 import blogModel from './schema.js'
 import commentModel from '../comments/schema.js'
 import createError from 'http-errors'
+import { adminMiddleware } from '../../authenticate/admin.js'
+import { AuthorAuth } from '../../authenticate/author.js'
 const blogPostsRouter = express.Router()
 
 blogPostsRouter.route('/')
@@ -23,39 +25,45 @@ blogPostsRouter.route('/')
     }
 })
 blogPostsRouter.route('/:blogId')
-.get(async(req,res,next)=>{
+.get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
     try {
-        const blogId = req.params.blogId
-        const blog = await blogModel.findById(blogId).populate('author')
-        if(blog){
-            res.send(blog)
-        }else{ next(createError(404, `blog with id ${blogId} not found!`))}
+         const blog = req.blog
+         if(!blog){
+             res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
+         }else{
+            const oneBlog =  await blogModel.findById(req.params.blogId).populate('author')
+             res.send(oneBlog)
+         }
     } catch (error) {
         next(error)
     }
 })
-.put(async(req,res,next)=>{
+.put(AuthorAuth,adminMiddleware,async(req,res,next)=>{
     try {
-        const blogId = req.params.blogId
-        const modifiedBlog = await blogModel.findByIdAndUpdate(blogId,req.body,{
-            new:true
-        })
-        if(modifiedBlog){
-            res.send(modifiedBlog)
-        }else{ next(createError(404, `blog with id ${blogId} not found!`))}
+        const blog = req.blog
+        if(!blog){
+            res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
+        }else{
+            const modifiedBlog = await blogModel.findByIdAndUpdate(req.params.blogId,req.body,{
+                new:true
+               })
+            res.send(modifiedBlog)  
+        }
     } catch (error) {
         next(error)
     }
 })
-.delete(async(req,res,next)=>{
+.delete(AuthorAuth,adminMiddleware,async(req,res,next)=>{
     try {
-        const blogId = req.params.blogId
-        const deltedBlog = await blogModel.findByIdAndDelete(blogId)
-        if(deltedBlog){
-            res.send(deltedBlog)
-        }else{ next(createError(404, `blog with id ${blogId} not found!`))}
+         const blog = req.blog
+         if(!blog){
+             res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
+         }else{
+             await blogModel.findByIdAndDelete(req.params.blogId)
+             res.status(204).send()
+         }
     } catch (error) {
-        next(error)
+        res.send(500).send({ message: error.message })
     }
 })
 

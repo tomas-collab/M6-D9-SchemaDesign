@@ -2,7 +2,6 @@ import express from 'express'
 import createHttpError from 'http-errors'
 import q2m from 'query-to-mongo'
 import { AuthorAuth } from '../../authenticate/author.js'
-import { auth } from '../../authenticate/index.js'
 import { jwtAuth } from '../../authenticate/tools.js'
 
 
@@ -29,7 +28,7 @@ authorRouter.route('/me')
         next(error)
     }
 })
-.put(auth,async(req,res,next)=>{
+.put(AuthorAuth,async(req,res,next)=>{
     try {
         req.author.name = req.body.name
         await req.author.save()
@@ -38,7 +37,7 @@ authorRouter.route('/me')
         next(error)
     }
 })
-.delete(auth,async(req,res,next)=>{
+.delete(AuthorAuth,async(req,res,next)=>{
     try {
         await req.author.deleteOne()
         res.send('deleted')
