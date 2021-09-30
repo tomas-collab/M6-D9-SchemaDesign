@@ -1,18 +1,20 @@
 import express from 'express'
 import cors from 'cors'
 import listEndpoints from 'express-list-endpoints'
-
-
 import mongoose from 'mongoose'
 import { badRequestErrorHandler, catchAllErrorHandler, notFoundErrorHandler, unauthorizedHandler } from './errorHandlers.js'
 import authorRouter from './services/authors/index.js'
 import blogsRouter  from './services/blogPosts/index.js'
 import commentRouter from './services/comments/index.js'
 import userRouter from './services/users/index.js'
+import GoogleStrategy from 'passport-google-oauth20'
+import passport from 'passport'
 
 const server = express()
 
 const port = process.env.PORT || 3001
+
+passport.use('google',GoogleStrategy)
 server.use(cors())
 server.use(express.json())
 
