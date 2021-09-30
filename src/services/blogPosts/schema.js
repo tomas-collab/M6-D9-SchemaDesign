@@ -11,9 +11,9 @@ const blogSchema = new Schema({
 	      value: {type:Number},
 	      unit: {type:Number},
 	    },
-	    author: {
+	    author: [{
 	           type:Schema.Types.ObjectId,required:true,ref:'Author'
-	    },comments:[{
+	    }],comments:[{
 			comment:String,
 			rate:Number,
 			commentedDate:Date

@@ -74,4 +74,15 @@ authorRouter.route("/login")
         next(error)
     }
 })
+
+authorRouter.route('/register')
+.post(async(req,res,next)=>{
+    try {
+        const newRegistration = new authorBlog(req.body)
+        const author = await newRegistration.save()
+        res.send(author)
+    } catch (error) {
+        next(error)
+    }
+})
 export default authorRouter
