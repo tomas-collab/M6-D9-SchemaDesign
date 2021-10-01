@@ -2,13 +2,29 @@ import express from 'express'
 import createHttpError from 'http-errors'
 import passport from 'passport'
 import q2m from 'query-to-mongo'
+import { adminMiddleware } from '../../authenticate/admin.js'
 import { AuthorAuth } from '../../authenticate/author.js'
 import { jwtAuth } from '../../authenticate/tools.js'
-
-
+import authorModel from './schema.js'
 import authorBlog from './schema.js'
-
+import blogModel from '../blogPosts/schema.js'
+import { JWTAuthMiddleware } from '../../authenticate/token.js'
 const authorRouter = express.Router()
+
+authorRouter.route('/googleLogin')
+.get(passport.authenticate('google',{scope:['profile','email']}))
+
+
+authorRouter.route('/googleRedirect')
+.get(passport.authenticate('google'),async(req,res,next)=>{
+    try {
+       console.log(req.user)
+        res.cookie("accessToken",req.user.tokens.accessToken)
+        res.redirect(`http://localhost:3001`)
+    } catch (error) {
+        console.log(error)
+    }
+})
 
 authorRouter.get('/',async(req,res,next)=>{
     try {
@@ -21,26 +37,24 @@ authorRouter.get('/',async(req,res,next)=>{
     }
 })
 authorRouter.route('/me')
-.get(AuthorAuth,async(req,res,next)=>{
+.get(JWTAuthMiddleware,async(req,res,next)=>{
     try {
-       
         res.send(req.author)
     } catch (error) {
         next(error)
     }
 })
-.put(AuthorAuth,async(req,res,next)=>{
+.put(JWTAuthMiddleware,async(req,res,next)=>{
     try {
-        req.author.name = req.body.name
-        await req.author.save()
-        res.send()
+        const updateAuthor = await authorModel.findByIdAndUpdate(req.author._id,req.body,{new:true})
+        res.send(updateAuthor)
     } catch (error) {
         next(error)
     }
 })
-.delete(AuthorAuth,async(req,res,next)=>{
+.delete(JWTAuthMiddleware,async(req,res,next)=>{
     try {
-        await req.author.deleteOne()
+        const deleteAuthor = await authorModel.findByIdAndDelete(req.author._id)
         res.send('deleted')
     } catch (error) {
         next(error)
@@ -67,7 +81,7 @@ authorRouter.route("/login")
        console.log('author',author)
        if(author){
            const Authorization = await jwtAuth(author)
-           res.send({Authorization})
+           res.send(Authorization)
        }else{
            next(createHttpError(401,'something wrong with credentials'))
        }
@@ -87,14 +101,15 @@ authorRouter.route('/register')
     }
 })
 
-authorRouter.route('/googleLogin')
-.get(passport.authenticate('google',{scope:['profile','email']}))
-
-
-authorRouter.route('/googleRedirect')
-.get(passport.authenticate('google'),async(req,res,next)=>{
+authorRouter.route('/me/blogPosts')
+.get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
     try {
-        res.redirect(`http://localhost:3001?accessToken=${req.author.tokens.accessToken}`)
+        const authorId = req.author._id
+        const myBlogpost = await blogModel.find({
+            author:authorId
+        })
+        res.send(myBlogpost)
+        
     } catch (error) {
         next(error)
     }

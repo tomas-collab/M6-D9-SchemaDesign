@@ -7,8 +7,9 @@ const {Schema, model} = mongoose
 const authorSchema = new Schema({
 	name: { type: String, required: true },
     surname: { type: String, required: true },
-	email: { type: String, required: true },
+	email: { type: String, required: true ,unique:true},
 	password: { type: String },
+	role: {type: String, required: true, enum: ["Admin", "Guest"], default: "Guest",},
 	refreshToken: { type: String },
     googleId: { type: String },
 	// blog:{type:Schema.Types.ObjectId,ref:"Blogpost"}
@@ -19,6 +20,7 @@ const authorSchema = new Schema({
 	authorSchema.pre('save',async function(next){
 		const author = this
 		const plainPw = author.password
+		
 		if(author.isModified("password")){
 			author.password = await bcrypt.hash(plainPw,12)
 		}

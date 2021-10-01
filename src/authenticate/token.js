@@ -3,6 +3,7 @@ import { verifyJWT } from "./tools.js";
 import authorModel from '../services/authors/schema.js'
 
 export const JWTAuthMiddleware = async(req,res,next)=>{
+    // if(!req.headers.authorization){
     if(!req.headers.authorization){
         next(createHttpError(401,'yo provide credentials '))
     }else{

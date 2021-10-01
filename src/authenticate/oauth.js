@@ -1,10 +1,10 @@
 import GoogleStrategy from 'passport-google-oauth20'
 import passport from 'passport'
 import authorModel from '../services/authors/schema.js'
-import { jwtAuth } from './tools'
+import { jwtAuth } from './tools.js'
 
 const googleStrategy = new GoogleStrategy({
-    clientId:process.env.GOOGLE_OAUTH_ID,
+    clientID:process.env.GOOGLE_OAUTH_ID,
     clientSecret:process.env.GOOGLE_OAUTH_SECRET,
     callbackURL: `${process.env.API_URL}:${process.env.PORT}/authors/googleRedirect`,
 },
@@ -12,7 +12,7 @@ async (accessToken,refreshToken,profile,passportNext)=>{
     try {
         const author = await authorModel.findOne({googleId:profile.id})
         if(author){
-            const tokens = jwtAuth(author)
+            const tokens = await jwtAuth(author)
             passportNext(null, { tokens })
         }else{
             const newAuthor = {
@@ -29,10 +29,9 @@ async (accessToken,refreshToken,profile,passportNext)=>{
     } catch (error) {
         console.log(error)
         passportNext(error)
-    }
-    passport.serializeUser(function(author,passportNext){
-        passportNext(null,author)
-    })
-}
-)
+    }})
+
+passport.serializeUser(function(user,passportNext){
+    passportNext(null,user)
+})
 export default googleStrategy

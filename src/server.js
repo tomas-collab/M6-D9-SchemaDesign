@@ -7,19 +7,20 @@ import authorRouter from './services/authors/index.js'
 import blogsRouter  from './services/blogPosts/index.js'
 import commentRouter from './services/comments/index.js'
 import userRouter from './services/users/index.js'
-import GoogleStrategy from 'passport-google-oauth20'
+import googleStrategy from './authenticate/oauth.js'
 import passport from 'passport'
-
+import cookieParser from 'cookie-parser'
 const server = express()
 
 const port = process.env.PORT || 3001
 
-passport.use('google',GoogleStrategy)
+passport.use('google',googleStrategy)
 
 
 
-server.use(cors())
+server.use(cors({origin:'http://localhost:3001',credentials:true}))
 server.use(express.json())
+server.use(cookieParser())
 server.use(passport.initialize())
 
 server.use("/blogPosts", blogsRouter)
