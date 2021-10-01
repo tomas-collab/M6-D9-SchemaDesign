@@ -5,6 +5,7 @@ import createError from 'http-errors'
 import { adminMiddleware } from '../../authenticate/admin.js'
 import { AuthorAuth } from '../../authenticate/author.js'
 import { JWTAuthMiddleware } from '../../authenticate/token.js'
+import createHttpError from 'http-errors'
 const blogPostsRouter = express.Router()
 
 blogPostsRouter.route('/')
@@ -30,43 +31,39 @@ blogPostsRouter.route('/')
 
 
 blogPostsRouter.route('/:blogId')
-.get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
+.get(JWTAuthMiddleware,adminMiddleware,async(req,res,next)=>{
     try {
-         const blog = req.blog
-         if(!blog){
-             res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
-         }else{
-            const oneBlog =  await blogModel.findById(req.params.blogId).populate('author')
+             const oneBlog =  await blogModel.findById(req.params.blogId).populate('author')
              res.send(oneBlog)
-         }
     } catch (error) {
         next(error)
     }
 })
-.put(AuthorAuth,adminMiddleware,async(req,res,next)=>{
+.put(JWTAuthMiddleware,adminMiddleware,async(req,res,next)=>{
     try {
-        const blog = req.blog
-        if(!blog){
-            res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
-        }else{
-            const modifiedBlog = await blogModel.findByIdAndUpdate(req.params.blogId,req.body,{
+            const modifiedBlog = await blogModel.findOneAndUpdate({_id:req.params.blogId,author:req.author._id},req.body,
+                {
                 new:true
                })
-            res.send(modifiedBlog)  
-        }
+               if(modifiedBlog){
+                   res.send(modifiedBlog)  
+                 }else{
+                     console.log('no modified blog')
+                 }
+      
     } catch (error) {
         next(error)
     }
 })
-.delete(AuthorAuth,adminMiddleware,async(req,res,next)=>{
+.delete(JWTAuthMiddleware,adminMiddleware,async(req,res,next)=>{
     try {
-         const blog = req.blog
-         if(!blog){
-             res.status(404).send({message:`blog with id ${req.params.blogId} not found!`})
-         }else{
-             await blogModel.findByIdAndDelete(req.params.blogId)
-             res.status(204).send()
-         }
+          const deleteBlog = await blogModel.findOneAndDelete({_id:req.params.blogId,author:req.author._id})
+          if(deleteBlog){
+              res.status(204).send()
+          }else{
+              next(createHttpError(404,'not found'))
+          }
+         
     } catch (error) {
         res.send(500).send({ message: error.message })
     }
