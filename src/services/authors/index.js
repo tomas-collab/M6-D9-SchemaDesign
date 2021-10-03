@@ -110,6 +110,17 @@ authorRouter.route('/register')
         next(error)
     }
 })
+authorRouter.route('/logOut')
+.post(jwtAuth,async(req,res,next)=>{
+    try {
+        req.author.refreshToken = null
+        await req.author.save()
+        res.send()
+    } catch (error) {
+        next(error)
+    }
+})
+
 
 authorRouter.route('/me/blogPosts')
 .get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
