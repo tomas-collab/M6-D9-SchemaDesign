@@ -78,10 +78,10 @@ authorRouter.route("/login")
     try {
        const {email,password} = req.body
        const author = await authorBlog.checkCredentials(email,password)
-       console.log('author',author)
        if(author){
-           const Authorization = await jwtAuth(author)
-           res.send(Authorization)
+           const {accessToken} = await jwtAuth(author)
+           res.send({accessToken})
+           console.log('token',{accessToken})
        }else{
            next(createHttpError(401,'something wrong with credentials'))
        }

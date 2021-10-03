@@ -18,9 +18,9 @@ passport.use('google',googleStrategy)
 
 
 
-server.use(cors({origin:'http://localhost:3001',credentials:true}))
+server.use(cors({origin:'http://localhost:3001'}))
 server.use(express.json())
-server.use(cookieParser())
+// server.use(cookieParser())
 server.use(passport.initialize())
 
 server.use("/blogPosts", blogsRouter)
