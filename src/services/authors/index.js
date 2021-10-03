@@ -23,6 +23,8 @@ authorRouter.route('/googleRedirect')
        console.log(req.user)
         res.cookie("accessToken",req.user.tokens.accessToken)
         res.redirect(`http://localhost:3001`)
+        // cookies can be stored in the headers 
+        // res.redirect(`http://localhost:3001?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`) alternative way of passing tokens
     } catch (error) {
         console.log(error)
     }
@@ -128,7 +130,7 @@ authorRouter.route('/logout')
 
                                              
 authorRouter.route('/me/blogPosts')
-.get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
+.get(JWTAuthMiddleware,adminMiddleware,async(req,res,next)=>{
     try {
         const authorId = req.author._id
         const myBlogpost = await blogModel.find({
@@ -136,6 +138,17 @@ authorRouter.route('/me/blogPosts')
         })
         res.send(myBlogpost)
         
+    } catch (error) {
+        next(error)
+    }
+})
+
+authorRouter.route('/:authorId')
+.get(JWTAuthMiddleware,adminMiddleware,async(req,res,next)=>{
+    try {
+        const authId = req.params.authorId
+        const author = await authorModel.findById(authId)
+        res.send(author)
     } catch (error) {
         next(error)
     }
