@@ -4,7 +4,7 @@ import passport from 'passport'
 import q2m from 'query-to-mongo'
 import { adminMiddleware } from '../../authenticate/admin.js'
 import { AuthorAuth } from '../../authenticate/author.js'
-import { jwtAuth } from '../../authenticate/tools.js'
+import { jwtAuth,refreshToken } from '../../authenticate/tools.js'
 import authorModel from './schema.js'
 import authorBlog from './schema.js'
 import blogModel from '../blogPosts/schema.js'
@@ -85,6 +85,16 @@ authorRouter.route("/login")
        }else{
            next(createHttpError(401,'something wrong with credentials'))
        }
+    } catch (error) {
+        next(error)
+    }
+})
+authorRouter.route('/refreshToken')
+.post(async(req,res,next)=>{
+    try {
+        const {actualRefreshToken} = req.body
+        const {refreshToken,accessToken} = await refreshToken(actualRefreshToken)
+        res.send({refreshToken,accessToken})
     } catch (error) {
         next(error)
     }
