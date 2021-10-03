@@ -17,7 +17,11 @@ const generateRefreshJWT = payload=>
 
 export const jwtAuth = async author =>{
     const accessToken = await generateJWT({_id:author._id})
-    return {accessToken}
+    const refreshToken = await generateRefreshJWT({_id:author._id})
+
+       author.refreshToken = refreshToken
+       await author.save()
+         return {accessToken,refreshToken}
 }
 
 
@@ -27,3 +31,11 @@ export const verifyJWT = token=>
              if(err) reject(err)
                 resolve(decodedToken)
          }))
+
+
+export const verifyRefreshToken = token=>
+           new Promise((resolve,reject)=>
+             jwt.verify(token,process.env.JWT_REFRESH_SECRET,(err,decodedToken)=>{
+                if(err) reject(err)
+                    resolve(decodedToken)
+             }))
