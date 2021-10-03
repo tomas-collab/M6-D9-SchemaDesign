@@ -12,7 +12,6 @@ const authorSchema = new Schema({
 	role: {type: String, required: true, enum: ["Admin", "Guest"], default: "Guest",},
 	refreshToken: { type: String },
     googleId: { type: String },
-	// blog:{type:Schema.Types.ObjectId,ref:"Blogpost"}
 	},{
 		timestamps:true
 	})

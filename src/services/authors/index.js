@@ -4,16 +4,18 @@ import passport from 'passport'
 import q2m from 'query-to-mongo'
 import { adminMiddleware } from '../../authenticate/admin.js'
 import { AuthorAuth } from '../../authenticate/author.js'
-import { jwtAuth,refreshToken } from '../../authenticate/tools.js'
 import authorModel from './schema.js'
 import authorBlog from './schema.js'
 import blogModel from '../blogPosts/schema.js'
 import { JWTAuthMiddleware } from '../../authenticate/token.js'
+import { jwtAuth,refreshTokens} from '../../authenticate/tools.js'
+
+
 const authorRouter = express.Router()
 
+                                                            //------------GOOGLE LOGIN
 authorRouter.route('/googleLogin')
 .get(passport.authenticate('google',{scope:['profile','email']}))
-
 
 authorRouter.route('/googleRedirect')
 .get(passport.authenticate('google'),async(req,res,next)=>{
@@ -25,7 +27,7 @@ authorRouter.route('/googleRedirect')
         console.log(error)
     }
 })
-
+                                                            //------------GET ALL
 authorRouter.get('/',async(req,res,next)=>{
     try {
         // const query =q2m(req.query)
@@ -36,6 +38,7 @@ authorRouter.get('/',async(req,res,next)=>{
         next(error)
     }
 })
+                                                            //------------ME
 authorRouter.route('/me')
 .get(JWTAuthMiddleware,async(req,res,next)=>{
     try {
@@ -61,7 +64,7 @@ authorRouter.route('/me')
     }
 })
 
-
+                                                             //------------POST AN AUTHOR
 authorRouter.post('/',async(req,res,next)=>{
     try {
         const newauthor = new authorBlog(req.body)
@@ -71,8 +74,19 @@ authorRouter.post('/',async(req,res,next)=>{
         next(error)
     }
 })
+                                                             //------------REGISTER NEW AUTHOR
+authorRouter.route('/register')
+.post(async(req,res,next)=>{
+    try {
+        const newRegistration = new authorBlog(req.body)
+        const author = await newRegistration.save()
+        res.send(author)
+    } catch (error) {
+        next(error)
+    }
+})
 
-
+                                                             //------------LOG IN 
 authorRouter.route("/login")
 .post(async(req,res,next)=>{
     try {
@@ -89,29 +103,20 @@ authorRouter.route("/login")
         next(error)
     }
 })
+                                                             //------------REFRESH TOKEN ---------------
 authorRouter.route('/refreshToken')
 .post(async(req,res,next)=>{
     try {
         const {actualRefreshToken} = req.body
-        const {refreshToken,accessToken} = await refreshToken(actualRefreshToken)
-        res.send({refreshToken,accessToken})
+        const {accessToken,refreshToken} = await refreshTokens(actualRefreshToken)
+        res.send({accessToken,refreshToken})
     } catch (error) {
         next(error)
     }
 })
-
-authorRouter.route('/register')
-.post(async(req,res,next)=>{
-    try {
-        const newRegistration = new authorBlog(req.body)
-        const author = await newRegistration.save()
-        res.send(author)
-    } catch (error) {
-        next(error)
-    }
-})
-authorRouter.route('/logOut')
-.post(jwtAuth,async(req,res,next)=>{
+                                                            //------------LOG OUT ---------------
+authorRouter.route('/logout')
+.post(JWTAuthMiddleware,async(req,res,next)=>{
     try {
         req.author.refreshToken = null
         await req.author.save()
@@ -121,7 +126,7 @@ authorRouter.route('/logOut')
     }
 })
 
-
+                                             
 authorRouter.route('/me/blogPosts')
 .get(AuthorAuth,adminMiddleware,async(req,res,next)=>{
     try {

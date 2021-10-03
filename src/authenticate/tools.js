@@ -5,7 +5,7 @@ import authorModel from '../services/authors/schema.js'
 //generate jwt accessToken
 const generateJWT = payload=>
        new Promise((resolve,reject)=>
-         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:" 1 day"},(err,token)=>{
+         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:"1 sec"},(err,token)=>{
            if(err) reject(err)
             resolve(token)
      })
@@ -25,7 +25,7 @@ export const jwtAuth = async author =>{
 
        author.refreshToken = refreshToken
        await author.save()
-         return {accessToken,refreshToken}
+      return {accessToken,refreshToken}
 }
 
 
@@ -37,20 +37,20 @@ export const verifyJWT = token=>
          }))
 
 
-export const verifyRefreshToken = token=>
+const verifyRefreshToken = token=>
            new Promise((resolve,reject)=>
              jwt.verify(token,process.env.JWT_REFRESH_SECRET,(err,decodedToken)=>{
                 if(err) reject(err)
                     resolve(decodedToken)
              }))
 
-export const refreshToken = async actualRefreshToken=>{
+export const refreshTokens = async actualRefreshToken=>{
         const decodedRefreshToken = await verifyRefreshToken(actualRefreshToken)
         const author = await authorModel.findById(decodedRefreshToken._id)
      if(!author) throw new Error('author not found')
        if(author.refreshToken === actualRefreshToken){
-         const {refreshToken,accessToken} = jwtAuth(author)
-         return {refreshToken,accessToken}
+         const {accessToken,refreshToken} = await jwtAuth(author)
+         return {accessToken,refreshToken}
       }else{
         throw createHttpError(401,'refresh token not valid')
   }
