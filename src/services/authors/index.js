@@ -21,13 +21,14 @@ authorRouter.route('/googleRedirect')
 .get(passport.authenticate('google'),async(req,res,next)=>{
     try {
        console.log(req.user)
-        res.cookie("accessToken",req.user.tokens.accessToken,{httpOnly:true})
-        res.cookie("refreshToken",req.user.tokens.refreshToken,{httpOnly:true})
-        res.redirect(`http://localhost:3001`)
+        // res.cookie("accessToken",req.user.tokens.accessToken,{httpOnly:true})
+        // res.cookie("refreshToken",req.user.tokens.refreshToken,{httpOnly:true})
+        // res.redirect(`http://localhost:3001/authors/Home/`)
         //secure: to work under https only
         //http only prevents from cracking the tokens by a javascript code
         // cookies can be stored in the headers 
-        // res.redirect(`http://localhost:3001?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`) alternative way of passing tokens
+        res.redirect(`http://localhost:3001/Home?accessToken=${req.user.tokens.accessToken}&refreshToken=${req.user.tokens.refreshToken}`) 
+        // alternative way of passing tokens
     } catch (error) {
         console.log(error)
     }

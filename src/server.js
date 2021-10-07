@@ -20,9 +20,9 @@ passport.use('google',googleStrategy)
 
 server.use(cors({origin:'http://localhost:3001'}))
 server.use(express.json())
-// server.use(cookieParser())
-server.use(passport.initialize())
-
+server.use(cookieParser())
+server.use(passport.initialize()) // inform express to start passport mandatory
+ 
 server.use("/blogPosts", blogsRouter)
 server.use('/comments',commentRouter)
 server.use('/users',userRouter)

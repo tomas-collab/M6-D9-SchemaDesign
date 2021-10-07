@@ -5,7 +5,7 @@ import authorModel from '../services/authors/schema.js'
 //generate jwt accessToken
 const generateJWT = payload=>
        new Promise((resolve,reject)=>
-         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:"1 sec"},(err,token)=>{
+         jwt.sign(payload,process.env.JWT_SECRET,{expiresIn:"1 week"},(err,token)=>{
            if(err) reject(err)
             resolve(token)
      })
